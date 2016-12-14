@@ -1,0 +1,62 @@
+#!/bin/bash
+
+nodes=()
+
+# Read the file in parameter and fill the array named "array"
+getArray() {
+    i=0
+    while read line # Read a line
+    do
+        nodes[i]=$line # Put it into the array
+        i=$(($i + 1))
+    done < $1
+}
+
+getArray "hosts"
+
+if [ "$1" == "run" ] && [ "$2" != "" ];then
+  for node in ${nodes[@]}
+  do
+    echo $node
+    ssh $node $2
+  done
+  exit
+fi
+if [ "$1" == "ntpdate" ];then
+  for node in ${nodes[@]}
+  do
+    echo $node will be ntpdate
+    ssh $node 'ntpdate time.stdtime.gov.tw' &
+  done
+  ntpdate time.stdtime.gov.tw
+  exit
+fi
+src_path=()
+dst_path=""
+if [ $1 == "copy" ] && [ $# -gt 3 ];then
+	shift 1
+	i=0
+	while [ -n "$1" ]
+	do
+		if [ $1 == "to" ];then
+			shift 1
+			dst_path=$1
+			break
+		else
+			src_path[i]=$1
+			i=$(($i+1))	
+			shift	
+		fi
+	done
+	if [ "$dst_path" == "" ];then
+		exit
+	fi
+	for src in ${src_path[@]}
+	do
+		for node in ${nodes[@]}
+		do
+			echo $node
+			scp $src $node:$dst_path
+		done
+	done
+fi
