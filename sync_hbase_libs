@@ -1,0 +1,35 @@
+#!/bin/bash
+
+nodes=()
+
+# Read the file in parameter and fill the array named "array"
+getArray() {
+    i=0
+    while read line # Read a line
+    do
+        nodes[i]=$line # Put it into the array
+        i=$(($i + 1))
+    done < $1
+}
+
+getArray "hosts"
+
+HBASE_REMOTE_HOME=/root/hbase
+HBASE_REMOTE_LIB=$HBASE_REMOTE_HOME/lib
+HBASE_REMOTE_CLEAN="rm -rf "$HBASE_REMOTE_LIB
+HBASE_VERSION=2.0.0-SNAPSHOT
+HBASE_SRC=$HOME/hbase
+HBASE_ASSEMBLY=$HBASE_SRC/hbase-assembly/target
+HBASE_GZ="hbase-"$HBASE_VERSION"-bin.tar.gz"
+HBASE_TARGET=$HBASE_ASSEMBLY/$HBASE_GZ
+HBASE_SRC_LIB="$HBASE_ASSEMBLY"/hbase-"$HBASE_VERSION"/lib
+tar -zxvf $HBASE_TARGET -C $HBASE_ASSEMBLY"/"
+for node in ${nodes[@]}
+do
+  echo $node
+  ssh $node $HBASE_REMOTE_CLEAN
+done
+for node in ${nodes[@]}
+do
+  scp -r $HBASE_SRC_LIB $node:$HBASE_REMOTE_HOME/
+done

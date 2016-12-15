@@ -34,29 +34,29 @@ fi
 src_path=()
 dst_path=""
 if [ $1 == "copy" ] && [ $# -gt 3 ];then
-	shift 1
-	i=0
-	while [ -n "$1" ]
-	do
-		if [ $1 == "to" ];then
-			shift 1
-			dst_path=$1
-			break
-		else
-			src_path[i]=$1
-			i=$(($i+1))	
-			shift	
-		fi
-	done
-	if [ "$dst_path" == "" ];then
-		exit
-	fi
-	for src in ${src_path[@]}
-	do
-		for node in ${nodes[@]}
-		do
-			echo $node
-			scp $src $node:$dst_path
-		done
-	done
+  shift 1
+  i=0
+  while [ -n "$1" ]
+  do
+    if [ $1 == "to" ];then
+      shift 1
+      dst_path=$1
+      break
+    else
+      src_path[i]=$1
+      i=$(($i+1))	
+      shift	
+    fi
+  done
+  if [ "$dst_path" == "" ];then
+    exit
+  fi
+  for src in ${src_path[@]}
+  do
+    for node in ${nodes[@]}
+    do
+      echo $node
+      scp -r $src $node:$dst_path
+    done
+  done
 fi
