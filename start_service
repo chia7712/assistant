@@ -1,0 +1,62 @@
+#!/bin/bash
+
+nodes=()
+
+# Read the file in parameter and fill the array named "array"
+getArray() {
+    i=0
+    while read line # Read a line
+    do
+        nodes[i]=$line # Put it into the array
+        i=$(($i + 1))
+    done < $1
+}
+
+getArray "hosts"
+
+HBASE_HOME=/root/hbase
+HADOOP_HOME=/root/hadoop
+CLEAN_HBASE='rm -rf '$HBASE_HOME'/logs'
+CLEAN_HADOOP='rm -rf '$HADOOP_HOME'/logs'
+START_HBASE=$HBASE_HOME'/bin/start-hbase.sh'
+FORMAT_NAMENODE=$HADOOP_HOME'/bin/hdfs namenode -format -force'
+START_HDFS=$HADOOP_HOME'/sbin/start-dfs.sh'
+START_YARN=$HADOOP_HOME'/sbin/start-yarn.sh'
+START_JS=$HADOOP_HOME'/sbin/mr-jobhistory-daemon.sh start historyserver'
+MASTER=node01
+echo "stop firewall"
+
+for node in ${nodes[@]}
+do
+  ssh $node 'systemctl stop firewalld'
+  ssh $node 'systemctl start ntpd'
+done
+
+echo "clean zookeeper"
+for node in ${nodes[@]}
+do
+  ssh $node 'rm -rf /root/zookeeper'
+done
+
+
+echo "clean hbase logs"
+for node in ${nodes[@]}
+do
+  ssh $node $CLEAN_HBASE
+done
+
+echo "clean hadoop"
+for node in ${nodes[@]}
+do
+  ssh $node $CLEAN_HADOOP
+  ssh $node 'rm -rf /tmp/hadoop*'
+done
+
+ssh $MASTER $FORMAT_NAMENODE
+ssh $MASTER $START_HDFS
+if [ "$1" == "all" ];then
+  echo "start YARN"
+  ssh $MASTER $START_YARN
+  ssh $MASTER $START_JS
+fi
+ssh $MASTER $START_HBASE
