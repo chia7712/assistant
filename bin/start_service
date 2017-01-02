@@ -39,17 +39,25 @@ do
 done
 
 
-echo "clean hbase logs"
+echo "clean hbase"
 for node in ${nodes[@]}
 do
   ssh $node $CLEAN_HBASE
+  ssh $node 'rm -rf /tmp/hbase-root'
+  ssh $node 'rm -f /tmp/hbase-root-regionserver.pid'
+  ssh $node 'rm -f /tmp/hbase-root-master.pid'
+  ssh $node 'rm -f /tmp/hbase-root-master.znode'
+  ssh $node 'rm -f /tmp/hbase-root-zookeeper.pid'
 done
 
 echo "clean hadoop"
 for node in ${nodes[@]}
 do
   ssh $node $CLEAN_HADOOP
-  ssh $node 'rm -rf /tmp/hadoop*'
+  ssh $node 'rm -rf /tmp/hadoop-root'
+  ssh $node 'rm -f /tmp/hadoop-root-namenode.pid'
+  ssh $node 'rm -f /tmp/hadoop-root-secondarynamenodes.pid'
+  ssh $node 'rm -f /tmp/hadoop-root-datanode.pid'
 done
 
 ssh $MASTER $FORMAT_NAMENODE
