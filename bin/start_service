@@ -13,58 +13,58 @@ getArray() {
 }
 
 getArray "hosts"
-
-HBASE_HOME=/root/hbase
-HADOOP_HOME=/root/hadoop
+SSH_PORT=12280
+SSH_CMD='ssh -p '$SSH_PORT
+USER=chia7712
+HBASE_HOME=/home/$USER/hbase-2.0.0-SNAPSHOT
+HADOOP_HOME=/home/$USER/hadoop-2.7.1
+ZOOKEEPER_DATA_HOME=/home/$USER/zookeeper
 CLEAN_HBASE='rm -rf '$HBASE_HOME'/logs'
+CLEAN_HBASE_PID='rm -rf /tmp/hbase*'
 CLEAN_HADOOP='rm -rf '$HADOOP_HOME'/logs'
+CLEAN_HADOOP_PID='rm -rf /tmp/hadoop*'
+CLEAN_ZOOKEEPER='rm -rf '$ZOOKEEPER_DATA_HOME
 START_HBASE=$HBASE_HOME'/bin/start-hbase.sh'
 FORMAT_NAMENODE=$HADOOP_HOME'/bin/hdfs namenode -format -force'
 START_HDFS=$HADOOP_HOME'/sbin/start-dfs.sh'
 START_YARN=$HADOOP_HOME'/sbin/start-yarn.sh'
 START_JS=$HADOOP_HOME'/sbin/mr-jobhistory-daemon.sh start historyserver'
-MASTER=node01
+MASTER=cat01
+NODEMANAGER=cat01
+NAMENODE=cat01
 echo "stop firewall"
 
-for node in ${nodes[@]}
-do
-  ssh $node 'systemctl stop firewalld'
-  ssh $node 'systemctl start ntpd'
-done
+#for node in ${nodes[@]}
+#do
+#  $SSH_CMD $node 'systemctl stop firewalld'
+#done
 
 echo "clean zookeeper"
 for node in ${nodes[@]}
 do
-  ssh $node 'rm -rf /root/zookeeper'
+  $SSH_CMD $node $CLEAN_ZOOKEEPER
 done
 
 
 echo "clean hbase"
 for node in ${nodes[@]}
 do
-  ssh $node $CLEAN_HBASE
-  ssh $node 'rm -rf /tmp/hbase-root'
-  ssh $node 'rm -f /tmp/hbase-root-regionserver.pid'
-  ssh $node 'rm -f /tmp/hbase-root-master.pid'
-  ssh $node 'rm -f /tmp/hbase-root-master.znode'
-  ssh $node 'rm -f /tmp/hbase-root-zookeeper.pid'
+  $SSH_CMD $node $CLEAN_HBASE
+  $SSH_CMD $node $CLEAN_HBASE_PID
 done
 
 echo "clean hadoop"
 for node in ${nodes[@]}
 do
-  ssh $node $CLEAN_HADOOP
-  ssh $node 'rm -rf /tmp/hadoop-root'
-  ssh $node 'rm -f /tmp/hadoop-root-namenode.pid'
-  ssh $node 'rm -f /tmp/hadoop-root-secondarynamenodes.pid'
-  ssh $node 'rm -f /tmp/hadoop-root-datanode.pid'
+  $SSH_CMD $node $CLEAN_HADOOP
+  $SSH_CMD $node $CLEAN_HADOOP_PID
 done
 
-ssh $MASTER $FORMAT_NAMENODE
-ssh $MASTER $START_HDFS
+$SSH_CMD $NAMENODE $FORMAT_NAMENODE
+$SSH_CMD $NAMENODE $START_HDFS
 if [ "$1" == "all" ];then
   echo "start YARN"
-  ssh $MASTER $START_YARN
-  ssh $MASTER $START_JS
+  $SSH_CMD $NODEMANAGER $START_YARN
+  $SSH_CMD $NODEMANAGER $START_JS
 fi
-ssh $MASTER $START_HBASE
+$SSH_CMD $MASTER $START_HBASE

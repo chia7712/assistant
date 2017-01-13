@@ -13,20 +13,30 @@ getArray() {
 }
 
 getArray "hosts"
-
+SSH_CMD='ssh -p 12280'
+SCP_CMD='scp -P 12280'
 if [ "$1" == "run" ] && [ "$2" != "" ];then
   for node in ${nodes[@]}
   do
     echo $node
-    ssh $node $2
+    $SSH_CMD $node $2
   done
   exit
 fi
+if [ "$1" == "reboot" ];then
+  for node in ${nodes[@]}
+  do
+    echo $node will reboot
+    $SSH_CMD $node '/usr/sbin/reboot'
+  done
+  exit
+fi
+
 if [ "$1" == "ntpdate" ];then
   for node in ${nodes[@]}
   do
-    echo $node will be ntpdate
-    ssh $node 'ntpdate time.stdtime.gov.tw' &
+    echo $node will ntpdate
+    $SSH_CMD $node 'ntpdate time.stdtime.gov.tw' &
   done
   ntpdate time.stdtime.gov.tw
   exit
@@ -56,7 +66,7 @@ if [ $1 == "copy" ] && [ $# -gt 3 ];then
     for node in ${nodes[@]}
     do
       echo $node
-      scp -r $src $node:$dst_path
+      $SCP_CMD -r $src $node:$dst_path
     done
   done
 fi
