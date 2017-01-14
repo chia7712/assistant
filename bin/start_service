@@ -16,8 +16,8 @@ getArray "hosts"
 SSH_PORT=12280
 SSH_CMD='ssh -p '$SSH_PORT
 USER=chia7712
-HBASE_HOME=/home/$USER/hbase-2.0.0-SNAPSHOT
-HADOOP_HOME=/home/$USER/hadoop-2.7.1
+HBASE_HOME=/home/$USER/hbase-1.4.0-SNAPSHOT
+HADOOP_HOME=/home/$USER/hadoop-2.5.1
 ZOOKEEPER_DATA_HOME=/home/$USER/zookeeper
 CLEAN_HBASE='rm -rf '$HBASE_HOME'/logs'
 CLEAN_HBASE_PID='rm -rf /tmp/hbase*'
