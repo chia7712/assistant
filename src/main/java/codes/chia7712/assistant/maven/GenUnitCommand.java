@@ -12,14 +12,14 @@ import java.util.TreeMap;
 public class GenUnitCommand {
 
   private static final List<String> SKIPS = Arrays.asList(
-          "TestSpnegoHttpServer"
+    "TestSpnegoHttpServer"
   );
   private static final String EXTRA_OPTS = null;
-  private static final String ISSUE = "hbase-17408";
+  private static final String ISSUE = "block";
   private static final int LIMIT = -1;
   private static final int PARALLER = 1;
-  private static final String HOME = "/Users/chia7712";
-  private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest-branch-1";
+  private static final String HOME = System.getProperty("user.home");
+  private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest";
   private static final boolean ALL_TEST = true;
 
   public static void main(String[] args) throws IOException {
