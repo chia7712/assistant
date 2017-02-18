@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#----------[LOCATE PROJECT]----------#
 date
 STARTTIME=$(date +'%s')
 SOURCE="${BASH_SOURCE[0]}"
@@ -12,11 +12,31 @@ do
 done
 BIN_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 PROJECT_HOME="$(dirname "$BIN_DIR")"
-JAVA='java -Xmx7000m -cp'
-CLASSPATH=$PROJECT_HOME'/lib_m/*:'$PROJECT_HOME'/lib/*:'$PROJECT_HOME'/conf/'
+
+#----------[JMX]----------#
+JMX_ENABLE="-Dcom.sun.management.jmxremote=true"
+JMX_PORT="-Dcom.sun.management.jmxremote.port=10101 -Dcom.sun.management.jmxremote.rmi.port=10101"
+JMX_DISABLE_SSL="-Dcom.sun.management.jmxremote.ssl=false"
+JMX_DISABLE_AUTH="-Dcom.sun.management.jmxremote.authenticate=false"
+JMX_OPTIONS="$JMX_ENABLE $JMX_PORT $JMX_DISABLE_SSL $JMX_DISABLE_AUTH"
+
+#----------[IPV4]----------#
+IPV4_PREFER="-Djava.net.preferIPv4Stack=true"
+
+#----------[HEAP SIZE]----------#
+HEAPSIZE="-Xmx4000m"
+
+#----------[JAVA]----------#
+JAVA="java $HEAPSIZE $JMX_OPTIONS $IPV4_PREFER -cp"
+
+#----------[CLASSPATH]----------#
+CLASSPATH="${PROJECT_HOME}/lib_m/*:${PROJECT_HOME}/lib/*:${PROJECT_HOME}/conf/"
+
+#----------[LOG4J]----------#
 LOG4J=-Dlog4j.configuration=file:$PROJECT_HOME'/conf/log4j.properties'
+
+#----------[FIND CLASS]----------#
 CLASS=''
-JAVA_OPTS=''
 if [ "$1" == "run_class" ]; then
   if [ "$2" == "" ]; then
     echo "Usage: run run_class <class> [<args>]"
@@ -37,7 +57,9 @@ do
   i=$(($i+1))
   shift
 done
-$JAVA $CLASSPATH $JAVA_OPTS $LOG4J $CLASS $ARGS
+
+#----------[EXECUTION]----------#
+$JAVA $CLASSPATH $LOG4J $CLASS $ARGS
 
 date
 ENDTIME=$(date +%s)
