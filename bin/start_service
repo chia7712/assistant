@@ -13,8 +13,8 @@ getArray() {
 }
 
 getArray "hosts"
-HBASE_VERSION="1.4.0-SNAPSHOT"
-HADOOP_VERSION="2.5.1"
+HBASE_VERSION="2.0.0-SNAPSHOT"
+HADOOP_VERSION="2.7.1"
 SSH_PORT=12280
 SSH_CMD='ssh -p '$SSH_PORT
 USER=chia7712
@@ -34,12 +34,6 @@ START_JS=$HADOOP_HOME'/sbin/mr-jobhistory-daemon.sh start historyserver'
 MASTER=cat01
 NODEMANAGER=cat01
 NAMENODE=cat01
-echo "stop firewall"
-
-#for node in ${nodes[@]}
-#do
-#  $SSH_CMD $node 'systemctl stop firewalld'
-#done
 
 echo "clean zookeeper"
 for node in ${nodes[@]}
