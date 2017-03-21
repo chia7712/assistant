@@ -41,7 +41,8 @@ public class WhoUseTheClass {
     IntStream.range(0, THREADS).forEach(i -> service.execute(new CodeLoader(
             folders,
             code -> {
-              if (code.getName().contains("Test")) {
+              if (code.getName().contains("Test")
+                || code.getFile().getAbsolutePath().contains("test")) {
                 testFiles.add(code);
               } else {
                 javaFiles.add(code);
