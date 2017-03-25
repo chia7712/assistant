@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 public class ParseLog {
   private static final String STOP_WORD = ",";
-  private static final File FILE = new File("/Users/chia7712/hbase-chia7712-regionserver-cat07.ncku.edu.tw.log");
+  private static final File FILE = new File("/Users/chia7712/hbase-chia7712-regionserver-cat03.ncku.edu.tw.log");
   public static void main(String[] args) throws IOException {
     parse("[IKEA]", Arrays.asList(
       new Grabber("read", Long::valueOf),
@@ -23,7 +23,20 @@ public class ParseLog {
     ));
     parse("[CAT]", Arrays.asList(
       new Grabber("readTime", Long::valueOf),
-      new Grabber("peekTime", Long::valueOf)
+      new Grabber("peekTime", Long::valueOf),
+      new Grabber("timeLimitTime", Long::valueOf),
+      new Grabber("checkTime", Long::valueOf),
+      new Grabber("matchTime", Long::valueOf),
+      new Grabber("optimizeTime", Long::valueOf),
+      new Grabber("overLimitTime", Long::valueOf),
+      new Grabber("rowMayTime", Long::valueOf),
+      new Grabber("filterAndLimitTime", Long::valueOf),
+      new Grabber("addCellTime", Long::valueOf),
+      new Grabber("nextCellTime", Long::valueOf),
+      new Grabber("setSizeTime", Long::valueOf),
+      new Grabber("doneTime", Long::valueOf),
+      new Grabber("callCount", Long::valueOf),
+      new Grabber("loopCount", Long::valueOf)
     ));
   }
   private static void parse(String prefix, List<Grabber> grabbers) throws IOException {
