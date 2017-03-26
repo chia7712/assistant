@@ -14,7 +14,8 @@ import java.util.function.Function;
 
 public class ParseLog {
   private static final String STOP_WORD = ",";
-  private static final File FILE = new File("/Users/chia7712/hbase-chia7712-regionserver-cat04.ncku.edu.tw.log");
+  private static final String HOME = System.getProperty("user.home");
+  private static final File FILE = new File(HOME + "/Dropbox/hbase-chia7712-regionserver-cat06.ncku.edu.tw.log");
   public static void main(String[] args) throws IOException {
     parse("[IKEA]", Arrays.asList(
       new Grabber("read", Long::valueOf),
