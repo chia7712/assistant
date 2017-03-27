@@ -19,62 +19,65 @@ public class ParseLog {
   public static void main(String[] args) throws IOException {
     parse("[IKEA]", Arrays.asList(
       new Grabber("read", Long::valueOf),
-      new Grabber("write", Long::valueOf),
-      new Grabber("count", Long::valueOf)
+      new Grabber("write", Long::valueOf)
+    ));
+    parse("[TINA]", Arrays.asList(
+      new Grabber("createScanner", Long::valueOf, true)
     ));
     parse("[CAT]", Arrays.asList(
       new Grabber("readTime", Long::valueOf),
       new Grabber("peekTime", Long::valueOf),
-      new Grabber("timeLimitTime", Long::valueOf),
-      new Grabber("checkTime", Long::valueOf),
-      new Grabber("matchTime", Long::valueOf),
-      new Grabber("optimizeTime", Long::valueOf),
-      new Grabber("overLimitTime", Long::valueOf),
-      new Grabber("rowMayTime", Long::valueOf),
-      new Grabber("filterAndLimitTime", Long::valueOf),
-      new Grabber("addCellTime", Long::valueOf),
-      new Grabber("updateSizeTime", Long::valueOf),
-      new Grabber("nextCellTime", Long::valueOf),
-      new Grabber("setSizeTime", Long::valueOf),
-      new Grabber("doneTime", Long::valueOf),
-      new Grabber("callCount", Long::valueOf),
-      new Grabber("loopCount", Long::valueOf)
+      new Grabber("matchTime", Long::valueOf, true),
+      new Grabber("updateSizeTime", Long::valueOf, true),
+      new Grabber("nextCellTime", Long::valueOf, true)
     ));
   }
   private static void parse(String prefix, List<Grabber> grabbers) throws IOException {
-    long count = 0;
     Map<Grabber, List<Long>> result = new LinkedHashMap<>();
     grabbers.forEach(v -> result.put(v, new ArrayList<>()));
     try (BufferedReader reader = new BufferedReader(new FileReader(FILE))) {
       String line;
       while ((line = reader.readLine()) != null) {
         if (line.contains(prefix)) {
-          ++count;
           final String s = line;
           result.forEach((k, v) -> v.add(findValue(s, k)));
         }
       }
     }
     StringBuilder buf = new StringBuilder();
-    result.forEach((v, k) -> buf.append(v.getName()).append("\t"));
-    buf.append("count").append("\n");
-    result.forEach((v, k) -> buf.append(k.stream().mapToLong(t -> t).sum()).append("\t"));
-    buf.append(count).append("\n");
+    result.forEach((v, k) -> {
+      if (v.getFindMinAndMax()) {
+        buf.append(k.stream().mapToLong(t -> t).min().getAsLong()).append("\t")
+            .append(k.stream().mapToLong(t -> t).average().getAsDouble()).append("\t")
+            .append(k.stream().mapToLong(t -> t).max().getAsLong()).append("\t");
+      } else {
+        buf.append(k.stream().mapToLong(t -> t).sum()).append("\t");
+      }
+    });
+    buf.deleteCharAt(buf.length() - 1);
     System.out.println(buf);
   }
   private static class Grabber implements Function<String, Long>, Comparable<Grabber> {
     private final Function<String, Long> f;
     private final String name;
+    private final boolean findMinAndMax;
     Grabber(String name, Function<String, Long> f) {
+      this(name, f, false);
+    }
+    Grabber(String name, Function<String, Long> f, boolean findMinAndMax) {
       this.name = name;
       this.f = f;
+      this.findMinAndMax = findMinAndMax;
+    }
+    boolean getFindMinAndMax() {
+      return this.findMinAndMax;
     }
     String getName() {
       return name;
     }
     @Override
     public Long apply(String t) {
-      return f.apply(t);
+      return f.apply(t) / 1000000;
     }
 
     @Override

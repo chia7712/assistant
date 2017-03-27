@@ -21,10 +21,7 @@ USER=chia7712
 HBASE_HOME=/home/$USER/hbase-$HBASE_VERSION
 HADOOP_HOME=/home/$USER/hadoop-$HADOOP_VERSION
 ZOOKEEPER_DATA_HOME=/home/$USER/zookeeper
-CLEAN_HBASE='rm -rf '$HBASE_HOME'/logs'
-CLEAN_HBASE_PID='rm -rf /tmp/hbase*'
-CLEAN_HADOOP='rm -rf '$HADOOP_HOME'/logs'
-CLEAN_HADOOP_PID='rm -rf /tmp/hadoop*'
+TMP_PATH=/tmp
 CLEAN_ZOOKEEPER='rm -rf '$ZOOKEEPER_DATA_HOME
 START_HBASE=$HBASE_HOME'/bin/start-hbase.sh'
 FORMAT_NAMENODE=$HADOOP_HOME'/bin/hdfs namenode -format -force'
@@ -45,15 +42,22 @@ done
 echo "clean hbase"
 for node in ${nodes[@]}
 do
-  $SSH_CMD $node $CLEAN_HBASE
-  $SSH_CMD $node $CLEAN_HBASE_PID
+  $SSH_CMD $node 'rm -rf '$HBASE_HOME'/logs'
+  $SSH_CMD $node 'rm -rf '$TMP_PATH'/hbase*'
 done
 
 echo "clean hadoop"
 for node in ${nodes[@]}
 do
-  $SSH_CMD $node $CLEAN_HADOOP
-  $SSH_CMD $node $CLEAN_HADOOP_PID
+  $SSH_CMD $node 'rm -rf '$HADOOP_HOME'/logs'
+  $SSH_CMD $node 'rm -rf '$TMP_PATH'/hadoop*'
+done
+
+echo "clean jetty"
+for node in ${nodes[@]}
+do
+  $SSH_CMD $node 'rm -rf '$TMP_PATH'/Je*'
+  $SSH_CMD $node 'rm -rf '$TMP_PATH'/je*'
 done
 
 $SSH_CMD $NAMENODE $FORMAT_NAMENODE
