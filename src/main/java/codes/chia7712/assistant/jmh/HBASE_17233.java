@@ -37,9 +37,64 @@ public class HBASE_17233 {
     Arrays.copyOfRange(res1, 10, 1000);
   }
 
+  @Benchmark
+  public void copyRangeV2() {
+    copyOfRangeV2(res1, 10, 1000);
+  }
+
+  @Benchmark
+  public void copyRangeV3() {
+    copyOfRangeV3(res1, 10, 1000);
+  }
+
+  @Benchmark
+  public void copyRangeV4() {
+    copyOfRangeV4(res1, 10, 1000);
+  }
+
+  @Benchmark
+  public void copyRangeV5() {
+    copyOfRangeV5(res1, 10, 1000);
+  }
+
+  private static byte[] copyOfRangeV2(byte[] original, int from, int to) {
+    int newLength = to - from;
+    if (newLength < 0) {
+      throw new IllegalArgumentException(from + " > " + to);
+    }
+    byte[] copy = new byte[newLength];
+    System.arraycopy(original, from, copy, 0,
+            Math.min(original.length - from, newLength));
+    return copy;
+  }
+
+  private static byte[] copyOfRangeV3(byte[] original, int from, int to) {
+    byte[] copy = new byte[to - from];
+    System.arraycopy(original, from, copy, 0,
+            Math.min(original.length - from, to - from));
+    return copy;
+  }
+
+  private static byte[] copyOfRangeV4(byte[] original, int from, int to) {
+    byte[] copy = new byte[to - from];
+    System.arraycopy(original, from, copy, 0, to - from);
+    return copy;
+  }
+
+  private static byte[] copyOfRangeV5(byte[] original, int from, int to) {
+    int length = Math.min(original.length - from, to - from);
+    byte[] copy = new byte[length];
+    System.arraycopy(original, from, copy, 0, length);
+    return copy;
+  }
+
   public static void main(String[] args) throws RunnerException {
-    Options opt = new OptionsBuilder().include(HBASE_17233.class.getSimpleName()).warmupIterations(1)
-            .measurementIterations(2).forks(1).build();
+    Options opt = new OptionsBuilder()
+            .include(HBASE_17233.class.getSimpleName())
+            .warmupIterations(1)
+            .measurementIterations(3)
+            .forks(2)
+            .build();
     new Runner(opt).run();
   }
 }
