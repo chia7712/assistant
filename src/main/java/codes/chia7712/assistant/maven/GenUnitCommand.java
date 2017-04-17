@@ -15,7 +15,7 @@ public class GenUnitCommand {
     "TestSpnegoHttpServer"
   );
   private static final String EXTRA_OPTS = null;
-  private static final String ISSUE = "all";
+  private static final String ISSUE = "15583";
   private static final int LIMIT = -1;
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");

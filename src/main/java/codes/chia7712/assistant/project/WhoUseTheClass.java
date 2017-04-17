@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-import javafx.util.Pair;
+import org.apache.commons.math3.util.Pair;
 
 public class WhoUseTheClass {
 
