@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HBASE_HOME=$HOME/apache/hbase
+HBASE_HOME=$HOME/hbase
 UT_NAME=''
 TIMES=''
 OUTPUT=''
