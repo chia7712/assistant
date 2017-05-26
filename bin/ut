@@ -1,27 +1,46 @@
 #!/bin/bash
 
 HBASE_HOME=$HOME/hbase
-UT_NAME=''
-TIMES=''
-OUTPUT=''
-MVN_CMD=''
-CURRENT_OUTPUT=''
-if [ "$1" == "" ] || [ "$2" == "" ] || [ "$3" == "" ]; then
-  echo "[USAGE] <UT> <TIMES> <OUTPUT>"
+if [ "$1" == "" ] || [ "$2" == "" ] || [ "$3" == "" ] || [ "$4" == "" ]; then
+  echo "[USAGE] <round/fail> <UT> <OUTPUT> <other args>"
   exit
-else
-  UT_NAME=$1
-  TIMES=$2
-  OUTPUT=$3
-  MVN_CMD="mvn clean test -Dtest="$UT_NAME" -P skipSparkTests"
+
 fi
-cd $HBASE_HOME
-i=0
-while [ "${i}" != "$TIMES" ]
-do
-  CURRENT_OUTPUT=$OUTPUT/$i
-  mkdir $CURRENT_OUTPUT
-  mvn clean test -Dtest=$UT_NAME -P skipSparkTests | tee $CURRENT_OUTPUT/console_$i
-  cp -r $HBASE_HOME/hbase-server/target/surefire-reports $CURRENT_OUTPUT/
-  i=$(($i+1))
-done
+UT_NAME=$2
+OUTPUT=$3
+MVN_CMD="mvn clean test -Dtest="$UT_NAME" -P skipSparkTests"
+if [ "$1" == "round" ]; then
+  TIMES=$4
+  cd $HBASE_HOME
+  i=0
+  while [ "${i}" != "$TIMES" ]
+  do
+    CURRENT_OUTPUT=$OUTPUT/$i
+    mkdir $CURRENT_OUTPUT
+    mvn clean test -Dtest=$UT_NAME -P skipSparkTests | tee $CURRENT_OUTPUT/console_$i
+    cp -r $HBASE_HOME/hbase-server/target/surefire-reports $CURRENT_OUTPUT/
+    i=$(($i+1))
+  done
+
+elif [ "$1" == "fail" ]; then
+  MIN_SIZE=$4
+  DONE='n'
+  i=0
+  cd $HBASE_HOME
+  while [ "$DONE" == "n" ]
+  do
+    i=$(($i+1))
+    file="$OUTPUT/console_fail_$i"
+    mvn clean test -Dtest=$UT_NAME -P skipSparkTests | tee $file
+    actualsize=$(wc -c <"$file")
+    if [ $actualsize -ge $MIN_SIZE ]; then
+      rm -f $file
+    else
+      cp -r $HBASE_HOME/hbase-server/target/surefire-reports $OUTPUT/
+      DONE='y'
+    fi
+  done
+else
+  echo "[USAGE] <round/fail> <UT> <OUTPUT> <other args>"
+  exit
+fi
