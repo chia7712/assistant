@@ -1,0 +1,14 @@
+#!/bin/bash
+
+HBASE_HOME=$HOME/hbase
+PATCH_PATH=''
+if [ "$1" == "" ] ; then
+  echo "[USAGE] <patch path>"
+  exit
+else
+  PATCH_PATH=$1
+fi
+cd $HBASE_HOME
+git checkout -- .
+git clean -df
+patch -p0 < $PATCH_PATH
