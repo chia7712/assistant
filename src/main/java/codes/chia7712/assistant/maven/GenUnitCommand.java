@@ -55,6 +55,7 @@ public class GenUnitCommand {
     });
     System.out.println("succeed classes:" + successes.size());
     System.out.println("succeed UTs:" + successes.stream().mapToInt(v -> v.getNumberOfUts()).sum());
+    successes.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("failed UTs:" + failures.stream().mapToInt(v -> v.getNumberOfFailures()).sum());
     failures.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("erroneous UTs:" + errors.stream().mapToInt(v -> v.getNumberOfErrors()).sum());
@@ -67,7 +68,7 @@ public class GenUnitCommand {
 
   private static String generate(Set<TestFileResult> results) throws IOException {
     StringBuilder builder = new StringBuilder("mvn clean test -fae -Dtest.exclude.pattern=");
-    results.forEach(r -> builder.append("**/").append(r.testClass).append(".java,"));
+    results.forEach(r -> builder.append("**/*").append(r.getSimpleTestClass()).append(".java,"));
     builder.deleteCharAt(builder.length() - 1);
     builder.append(" -DsecondPartForkCount=")
             .append(PARALLER);
@@ -143,6 +144,10 @@ public class GenUnitCommand {
       this.numberOfFailures = numberOfFailures;
       this.numberOfErrors = numberOfErrors;
       this.numberOfSkipped = numberOfSkipped;
+    }
+
+    String getSimpleTestClass() {
+      return testClass.substring(testClass.lastIndexOf(".") + 1);
     }
 
     String getTestClass() {
