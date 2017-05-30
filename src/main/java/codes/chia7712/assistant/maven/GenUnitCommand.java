@@ -60,7 +60,7 @@ public class GenUnitCommand {
     System.out.println(generate(successes));
   }
 
-  public static String generate(Set<TestFileResult> results) throws IOException {
+  private static String generate(Set<TestFileResult> results) throws IOException {
     StringBuilder builder = new StringBuilder("mvn clean test -fae -Dtest.exclude.pattern=");
     results.forEach(r -> builder.append("**/").append(r.testClass).append(".java,"));
     builder.deleteCharAt(builder.length() - 1);
