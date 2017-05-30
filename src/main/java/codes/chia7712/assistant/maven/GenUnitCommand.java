@@ -109,7 +109,9 @@ public class GenUnitCommand {
   }
 
   private static double findElapsed(String line) {
-    return Double.valueOf(line.substring(line.indexOf(":") + 2, line.length() - 5));
+    String key1 = "Time elapsed: ";
+    String key2 = " sec";
+    return Double.valueOf(line.substring(line.indexOf(key1) + key1.length(), line.indexOf(key2)));
   }
 
   private static String findTestClass(String line) {
