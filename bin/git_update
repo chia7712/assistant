@@ -2,17 +2,14 @@
 
 PROJECT_PATH=''
 BRANCH=''
-if [ "$1" == "" ] ; then
-  echo "<git project> [branch]"
+if [ "$1" == "" ] || [ "$2" == "" ] ; then
+  echo "<git project> <branch> [patch]"
   exit
 else
   PROJECT_PATH=$1
-fi
-if [ "$2" == "" ] ; then
-  BRANCH='master'
-else
   BRANCH=$2
 fi
+
 cd $PROJECT_PATH
 git checkout -- .
 git clean -df
@@ -20,3 +17,6 @@ git checkout $BRANCH
 git checkout -- .
 git clean -df
 git pull
+if [ "$3" != "" ] ; then
+  patch -p0 < $3
+fi
