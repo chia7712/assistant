@@ -1,46 +1,46 @@
 #!/bin/bash
 
 HBASE_HOME=$HOME/hbase
-if [ "$1" == "" ] || [ "$2" == "" ] || [ "$3" == "" ] || [ "$4" == "" ]; then
-  echo "[USAGE] <round/fail> <UT> <OUTPUT> <other args>"
+HBASE_SERVER_REPORTS=$HOME/hbase/hbase-server/target/surefire-reports
+HBASE_CLIENT_REPORTS=$HOME/hbase/hbase-client/target/surefire-reports
+if [ "$1" == "" ] || [ "$2" == "" ] ; then
+  echo "<UT> <OUTPUT> [TIMES]"
   exit
-
 fi
-UT_NAME=$2
-OUTPUT=$3
-MVN_CMD="mvn clean test -Dtest="$UT_NAME" -P skipSparkTests"
-if [ "$1" == "round" ]; then
-  TIMES=$4
-  cd $HBASE_HOME
-  i=0
-  while [ "${i}" != "$TIMES" ]
-  do
-    CURRENT_OUTPUT=$OUTPUT/$i
-    mkdir $CURRENT_OUTPUT
-    mvn clean test -Dtest=$UT_NAME -P skipSparkTests | tee $CURRENT_OUTPUT/console_$i
-    cp -r $HBASE_HOME/hbase-server/target/surefire-reports $CURRENT_OUTPUT/
-    i=$(($i+1))
-  done
-
-elif [ "$1" == "fail" ]; then
-  MIN_SIZE=$4
-  DONE='n'
-  i=0
-  cd $HBASE_HOME
-  while [ "$DONE" == "n" ]
-  do
-    i=$(($i+1))
-    file="$OUTPUT/console_fail_$i"
-    mvn clean test -Dtest=$UT_NAME -P skipSparkTests | tee $file
-    actualsize=$(wc -c <"$file")
-    if [ $actualsize -ge $MIN_SIZE ]; then
-      rm -f $file
-    else
-      cp -r $HBASE_HOME/hbase-server/target/surefire-reports $OUTPUT/
-      DONE='y'
-    fi
-  done
+UT_NAME=$1
+OUTPUT=$2
+TIMES=''
+if [ "$3" == "" ]; then
+  TIMES=9999
 else
-  echo "[USAGE] <round/fail> <UT> <OUTPUT> <other args>"
-  exit
+  TIMES=$3
 fi
+cd $HBASE_HOME
+i=0
+while [ "${i}" != "$TIMES" ]
+do
+  CURRENT_OUTPUT=$OUTPUT/$i
+  if [ -d "$CURRENT_OUTPUT" ]; then
+    echo "folder exists:"$CURRENT_OUTPUT
+    exit
+  fi
+  file="$CURRENT_OUTPUT/console_$i"
+  mkdir $CURRENT_OUTPUT
+  mvn clean test -Dtest=$UT_NAME -P skipSparkTests > $file
+  if [ -d "$HBASE_SERVER_REPORTS" ]; then
+    mkdir $CURRENT_OUTPUT/hbase-server
+    cp -r $HBASE_SERVER_REPORTS $CURRENT_OUTPUT/hbase-server/
+  fi
+  if [ -d "$HBASE_CLIENT_REPORTS" ]; then
+    mkdir $CURRENT_OUTPUT/hbase-client
+    cp -r $HBASE_CLIENT_REPORTS $CURRENT_OUTPUT/hbase-client/
+  fi
+  i=$(($i+1))
+  name=''
+  while read -r name
+  do
+    if [ "$name" == "[INFO] BUILD FAILURE" ] ; then
+      exit;
+    fi
+  done < $file
+done
