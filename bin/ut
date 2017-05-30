@@ -37,10 +37,14 @@ do
   fi
   i=$(($i+1))
   name=''
+  successCount=0
   while read -r name
   do
-    if [ "$name" == "[INFO] BUILD FAILURE" ] ; then
-      exit;
+    if [ "$name" == "[INFO] BUILD SUCCESS" ] ; then
+      successCount=$(($successCount+1))
     fi
   done < $file
+  if [ $successCount -eq 0 ] ; then
+    exit
+  fi
 done
