@@ -53,10 +53,10 @@ public class GenUnitCommand {
       } 
     });
     System.out.println("succeed classes:" + successes.size());
-    System.out.println("succeed uts:" + successes.stream().mapToInt(v -> v.numberOfUts).sum());
-    System.out.println("failed uts:" + failures.stream().mapToInt(v -> v.numberOfUts).sum());
-    System.out.println("error uts:" + errors.stream().mapToInt(v -> v.numberOfUts).sum());
-    System.out.println("skipped uts:" + skipped.stream().mapToInt(v -> v.numberOfUts).sum());
+    System.out.println("succeed UTs:" + successes.stream().mapToInt(v -> v.numberOfUts).sum());
+    System.out.println("failed UTs:" + failures.stream().mapToInt(v -> v.numberOfUts).sum());
+    System.out.println("erroneous UTs:" + errors.stream().mapToInt(v -> v.numberOfUts).sum());
+    System.out.println("skipped UTs:" + skipped.stream().mapToInt(v -> v.numberOfUts).sum());
     System.out.println("----------------------");
     System.out.println(generate(successes));
   }
