@@ -26,7 +26,7 @@ do
   fi
   file="$CURRENT_OUTPUT/console_$i"
   mkdir $CURRENT_OUTPUT
-  mvn clean test -Dtest=$UT_NAME -P skipSparkTests > $file
+  mvn clean test -Dtest=$UT_NAME -P skipSparkTests | tee $file
   if [ -d "$HBASE_SERVER_REPORTS" ]; then
     mkdir $CURRENT_OUTPUT/hbase-server
     cp -r $HBASE_SERVER_REPORTS $CURRENT_OUTPUT/hbase-server/
