@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class GenUnitCommand {
 
@@ -39,24 +40,27 @@ public class GenUnitCommand {
     Set<TestFileResult> errors = new TreeSet<>();
     Set<TestFileResult> skipped = new TreeSet<>();
     results.forEach(result -> {
-      if (result.numberOfErrors != 0) {
+      if (result.getNumberOfErrors() != 0) {
         errors.add(result);
       }
-      if (result.numberOfFailures != 0) {
+      if (result.getNumberOfFailures() != 0) {
         failures.add(result);
       }
-      if (result.numberOfSkipped != 0) {
+      if (result.getNumberOfSkipped() != 0) {
         skipped.add(result);
       }
-      if (result.numberOfFailures == 0 && result.numberOfErrors == 0) {
+      if (result.getNumberOfFailures() == 0 && result.getNumberOfErrors() == 0) {
         successes.add(result);
       }
     });
     System.out.println("succeed classes:" + successes.size());
-    System.out.println("succeed UTs:" + successes.stream().mapToInt(v -> v.numberOfUts).sum());
-    System.out.println("failed UTs:" + failures.stream().mapToInt(v -> v.numberOfUts).sum());
-    System.out.println("erroneous UTs:" + errors.stream().mapToInt(v -> v.numberOfUts).sum());
-    System.out.println("skipped UTs:" + skipped.stream().mapToInt(v -> v.numberOfUts).sum());
+    System.out.println("succeed UTs:" + successes.stream().mapToInt(v -> v.getNumberOfUts()).sum());
+    System.out.println("failed UTs:" + failures.stream().mapToInt(v -> v.getNumberOfFailures()).sum());
+    failures.forEach(v -> System.out.println(v.getTestClass()));
+    System.out.println("erroneous UTs:" + errors.stream().mapToInt(v -> v.getNumberOfErrors()).sum());
+    errors.forEach(v -> System.out.println(v.getTestClass()));
+    System.out.println("skipped UTs:" + skipped.stream().mapToInt(v -> v.getNumberOfSkipped()).sum());
+    skipped.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("----------------------");
     System.out.println(generate(successes));
   }
@@ -139,6 +143,30 @@ public class GenUnitCommand {
       this.numberOfFailures = numberOfFailures;
       this.numberOfErrors = numberOfErrors;
       this.numberOfSkipped = numberOfSkipped;
+    }
+
+    String getTestClass() {
+      return testClass;
+    }
+
+    double getElapsed() {
+      return elapsed;
+    }
+
+    int getNumberOfUts() {
+      return numberOfUts;
+    }
+
+    int getNumberOfFailures() {
+      return numberOfFailures;
+    }
+
+    int getNumberOfErrors() {
+      return numberOfErrors;
+    }
+
+    int getNumberOfSkipped() {
+      return numberOfSkipped;
     }
 
     @Override
