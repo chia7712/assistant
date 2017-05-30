@@ -18,7 +18,7 @@ public class GenUnitCommand {
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
-    + ("master".equals(BRANCH) ? "" : "_" + BRANCH); 
+          + ("master".equals(BRANCH) ? "" : "_" + BRANCH);
   private static final boolean ALL_TEST = true;
 
   public static void main(String[] args) throws IOException {
@@ -50,7 +50,7 @@ public class GenUnitCommand {
       }
       if (result.numberOfFailures == 0 && result.numberOfErrors == 0) {
         successes.add(result);
-      } 
+      }
     });
     System.out.println("succeed classes:" + successes.size());
     System.out.println("succeed UTs:" + successes.stream().mapToInt(v -> v.numberOfUts).sum());
@@ -92,6 +92,7 @@ public class GenUnitCommand {
     }
     return results;
   }
+
   private static Optional<TestFileResult> parse(String line) {
     final String[] elements = line.split(",");
     if (elements.length != 5) {
@@ -106,24 +107,30 @@ public class GenUnitCommand {
     String testClass = findTestClass(timeAndTestClass[1]);
     return Optional.of(new TestFileResult(testClass, elapsed, numberOfUts, numberOfFailures, numberOfErrors, numberOfSkipped));
   }
+
   private static double findElapsed(String line) {
     return Double.valueOf(line.substring(line.indexOf(":") + 2, line.length() - 5));
   }
+
   private static String findTestClass(String line) {
     return line.substring(4);
   }
+
   private static int findElements(String line) {
     return Integer.valueOf(line.substring(line.indexOf(":") + 2));
   }
+
   private static class TestFileResult implements Comparable<TestFileResult> {
+
     private final String testClass;
     private final double elapsed;
     private final int numberOfUts;
     private final int numberOfFailures;
     private final int numberOfErrors;
     private final int numberOfSkipped;
+
     TestFileResult(final String testClass, double elapsed, int numberOfUts, int numberOfFailures,
-      int numberOfErrors, int numberOfSkipped) {
+            int numberOfErrors, int numberOfSkipped) {
       this.testClass = testClass;
       this.elapsed = elapsed;
       this.numberOfUts = numberOfUts;
