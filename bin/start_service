@@ -13,14 +13,14 @@ getArray() {
 }
 
 getArray "hosts"
-HBASE_VERSION="2.0.0-SNAPSHOT"
-HADOOP_VERSION="2.7.1"
+HBASE_VERSION="1.2.6"
+HADOOP_VERSION="2.5.1"
 SSH_PORT=12280
 SSH_CMD='ssh -p '$SSH_PORT
 USER=chia7712
 HBASE_HOME=/home/$USER/hbase-$HBASE_VERSION
 HADOOP_HOME=/home/$USER/hadoop-$HADOOP_VERSION
-ZOOKEEPER_DATA_HOME=/home/$USER/zookeeper
+ZOOKEEPER_DATA_HOME=/tmp/zookeeper
 TMP_PATH=/tmp
 CLEAN_ZOOKEEPER='rm -rf '$ZOOKEEPER_DATA_HOME
 START_HBASE=$HBASE_HOME'/bin/start-hbase.sh'
@@ -28,9 +28,9 @@ FORMAT_NAMENODE=$HADOOP_HOME'/bin/hdfs namenode -format -force'
 START_HDFS=$HADOOP_HOME'/sbin/start-dfs.sh'
 START_YARN=$HADOOP_HOME'/sbin/start-yarn.sh'
 START_JS=$HADOOP_HOME'/sbin/mr-jobhistory-daemon.sh start historyserver'
-MASTER=cat01
-NODEMANAGER=cat01
-NAMENODE=cat01
+MASTER=cat00
+NODEMANAGER=cat00
+NAMENODE=cat00
 
 echo "clean zookeeper"
 for node in ${nodes[@]}
