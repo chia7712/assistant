@@ -15,7 +15,16 @@ getArray() {
 getArray "hosts"
 SSH_CMD='ssh -p 12280'
 SCP_CMD='scp -P 12280'
-if [ "$1" == "run" ] && [ "$2" != "" ];then
+if [ "$1" == "stop_all_ut" ] ; then
+  CLOSE_FLAG="/tmp/assistant_ut_stop"
+  for node in ${nodes[@]}
+  do
+    echo "stop" >> $CLOSE_FLAG
+    $SCP_CMD $CLOSE_FLAG $node:$CLOSE_FLAG
+  done
+  exit
+fi
+if [ "$1" == "run" ] && [ "$2" != "" ] ; then
   for node in ${nodes[@]}
   do
     echo $node
