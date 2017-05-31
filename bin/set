@@ -16,11 +16,20 @@ getArray "hosts"
 SSH_CMD='ssh -p 12280'
 SCP_CMD='scp -P 12280'
 if [ "$1" == "run_bg" ] && [ "$2" != "" ] ; then
-  echo "[WARNING] All ut will run in background"
+  echo "[WARNING] The command will run in background and all output are redirected to /dev/null"
   for node in ${nodes[@]}
   do
     echo "Run $2 on the $node"
     $SSH_CMD $node $2 > /dev/null &
+  done
+  exit
+fi
+if [ "$1" == "run_bg_print" ] && [ "$2" != "" ] ; then
+  echo "[WARNING] The command will run in background"
+  for node in ${nodes[@]}
+  do
+    echo "Run $2 on the $node"
+    $SSH_CMD $node $2 &
   done
   exit
 fi
