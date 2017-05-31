@@ -16,9 +16,9 @@ getArray() {
     done < $1
 }
 
-getArray "hosts"
 SCP_CMD='scp -P 12280'
 if [ "$1" == "stop_all" ] ; then
+  getArray "hosts"
   for node in ${nodes[@]}
   do
     echo "stop" >> $CLOSE_FLAG
