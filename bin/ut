@@ -3,8 +3,32 @@
 HBASE_HOME=$HOME/hbase
 HBASE_SERVER_REPORTS=$HOME/hbase/hbase-server/target/surefire-reports
 HBASE_CLIENT_REPORTS=$HOME/hbase/hbase-client/target/surefire-reports
+CLOSE_FLAG="/tmp/assistant_ut_stop"
+nodes=()
+
+# Read the file in parameter and fill the array named "array"
+getArray() {
+    i=0
+    while read line # Read a line
+    do
+        nodes[i]=$line # Put it into the array
+        i=$(($i + 1))
+    done < $1
+}
+
+getArray "hosts"
+SCP_CMD='scp -P 12280'
+if [ "$1" == "stop_all" ] ; then
+  for node in ${nodes[@]}
+  do
+    echo "stop" >> $CLOSE_FLAG
+    $SCP_CMD $CLOSE_FLAG $node:$CLOSE_FLAG
+  done
+  exit
+fi
 if [ "$1" == "" ] || [ "$2" == "" ] ; then
   echo "<UT> <OUTPUT> [TIMES]"
+  echo "<stop_all>"
   exit
 fi
 UT_NAME=$1
@@ -19,6 +43,10 @@ cd $HBASE_HOME
 i=0
 while [ "${i}" != "$TIMES" ]
 do
+  if [ -f $CLOSE_FLAG ] ; then
+    rm -f $CLOSE_FLAG
+    exit
+  fi
   CURRENT_OUTPUT=$OUTPUT/$i
   if [ -d "$CURRENT_OUTPUT" ]; then
     echo "folder exists:"$CURRENT_OUTPUT
