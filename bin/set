@@ -15,12 +15,12 @@ getArray() {
 getArray "hosts"
 SSH_CMD='ssh -p 12280'
 SCP_CMD='scp -P 12280'
-if [ "$1" == "stop_all_ut" ] ; then
-  CLOSE_FLAG="/tmp/assistant_ut_stop"
+if [ "$1" == "run_bg" ] && [ "$2" != "" ] ; then
+  echo "[WARNING] All ut will run in background"
   for node in ${nodes[@]}
   do
-    echo "stop" >> $CLOSE_FLAG
-    $SCP_CMD $CLOSE_FLAG $node:$CLOSE_FLAG
+    echo "Run $2 on the $node"
+    $SSH_CMD $node $2 > /dev/null &
   done
   exit
 fi
