@@ -5,17 +5,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class GenUnitCommand {
 
+  private static final List<TestFileResult> SKIPPED_CLASSES = Arrays.asList(
+    new TestFileResult("org.apache.hadoop.hbase.http.TestSpnegoHttpServer")
+  );
   private static final String EXTRA_OPTS = null;
   private static final String BRANCH = "master";
-  private static final String ISSUE = "1.2.6";
+  private static final String ISSUE = "18145";
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
@@ -35,6 +38,7 @@ public class GenUnitCommand {
     } else {
       System.out.println("No found of unittest dir:" + PATH);
     }
+    results.addAll(SKIPPED_CLASSES);
     Set<TestFileResult> successes = new TreeSet<>();
     Set<TestFileResult> failures = new TreeSet<>();
     Set<TestFileResult> errors = new TreeSet<>();
@@ -135,6 +139,10 @@ public class GenUnitCommand {
     private final int numberOfFailures;
     private final int numberOfErrors;
     private final int numberOfSkipped;
+
+    TestFileResult(final String testClass) {
+      this(testClass, 0, 0, 0, 0, 0);
+    }
 
     TestFileResult(final String testClass, double elapsed, int numberOfUts, int numberOfFailures,
             int numberOfErrors, int numberOfSkipped) {
