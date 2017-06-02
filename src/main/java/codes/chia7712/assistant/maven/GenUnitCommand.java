@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class GenUnitCommand {
 
@@ -43,6 +44,7 @@ public class GenUnitCommand {
     Set<TestFileResult> failures = new TreeSet<>();
     Set<TestFileResult> errors = new TreeSet<>();
     Set<TestFileResult> skipped = new TreeSet<>();
+    Set<TestFileResult> neverSucceed = new TreeSet<>();
     results.forEach(result -> {
       if (result.getNumberOfErrors() != 0) {
         errors.add(result);
@@ -57,6 +59,8 @@ public class GenUnitCommand {
         successes.add(result);
       }
     });
+    failures.stream().filter(v -> !successes.contains(v)).forEach(neverSucceed::add);
+    errors.stream().filter(v -> !successes.contains(v)).forEach(neverSucceed::add);
     System.out.println("succeed classes:" + successes.size());
     System.out.println("succeed UTs:" + successes.stream().mapToInt(v -> v.getNumberOfUts()).sum());
     successes.forEach(v -> System.out.println(v.getTestClass()));
@@ -66,11 +70,21 @@ public class GenUnitCommand {
     errors.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("skipped UTs:" + skipped.stream().mapToInt(v -> v.getNumberOfSkipped()).sum());
     skipped.forEach(v -> System.out.println(v.getTestClass()));
+    System.out.println("neverSucceed UTs:" + neverSucceed.stream().mapToInt(v -> v.getNumberOfErrors() + v.getNumberOfFailures()).sum());
+    neverSucceed.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("----------------------");
-    System.out.println(generate(successes));
+    System.out.println(generateGeneralCommand(successes));
+    System.out.println("----------------------");
+    generateSeparateCommand(neverSucceed).forEach(System.out::println);
   }
 
-  private static String generate(Set<TestFileResult> results) throws IOException {
+  private static List<String> generateSeparateCommand(Set<TestFileResult> results) {
+    return results.stream()
+      .map(r -> "mvn clean test -Dtest=" + r.getTestClass() + " -P skipSparkTests | tee ~/test_" + r.getSimpleTestClass())
+      .collect(Collectors.toList());
+  }
+
+  private static String generateGeneralCommand(Set<TestFileResult> results) {
     StringBuilder builder = new StringBuilder("mvn clean test -fae -Dtest.exclude.pattern=");
     results.forEach(r -> builder.append("**/*").append(r.getSimpleTestClass()).append(".java,"));
     builder.deleteCharAt(builder.length() - 1);
