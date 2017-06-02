@@ -17,7 +17,7 @@ public class GenUnitCommand {
     new TestFileResult("org.apache.hadoop.hbase.http.TestSpnegoHttpServer")
   );
   private static final String EXTRA_OPTS = null;
-  private static final String BRANCH = "master";
+  private static final String BRANCH = "branch-1.3";
   private static final String ISSUE = "18145";
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");
@@ -84,7 +84,9 @@ public class GenUnitCommand {
               .append(EXTRA_OPTS);
     }
     builder.append(" | tee ~/test_")
-            .append(ISSUE);
+           .append("master".equals(BRANCH) ? "" : "_" + BRANCH)
+           .append("_")
+           .append(ISSUE);
     return builder.substring(0, builder.length());
   }
 
