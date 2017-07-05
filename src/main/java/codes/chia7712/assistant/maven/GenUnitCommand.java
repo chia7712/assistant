@@ -19,7 +19,7 @@ public class GenUnitCommand {
   );
   private static final String EXTRA_OPTS = null;
   private static final String BRANCH = "master";
-  private static final String ISSUE = "18145";
+  private static final String ISSUE = "18241";
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
@@ -32,9 +32,6 @@ public class GenUnitCommand {
     if (dir.exists()) {
       for (File f : dir.listFiles()) {
         results.addAll(parse(f));
-      }
-      if (results.isEmpty()) {
-        System.out.println("No found of unittest file from the dir:" + PATH);
       }
     } else {
       System.out.println("No found of unittest dir:" + PATH);
@@ -109,7 +106,7 @@ public class GenUnitCommand {
     try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
       String line;
       while ((line = reader.readLine()) != null) {
-        if (!line.startsWith("Tests run")) {
+        if (!line.startsWith("[INFO] Tests run")) {
           continue;
         }
         parse(line).ifPresent(results::add);
@@ -135,8 +132,10 @@ public class GenUnitCommand {
 
   private static double findElapsed(String line) {
     String key1 = "Time elapsed: ";
-    String key2 = " sec";
-    return Double.valueOf(line.substring(line.indexOf(key1) + key1.length(), line.indexOf(key2)));
+    String key2 = " s";
+    final int indexOfKey1 = line.indexOf(key1);
+    final int indexOfKey2 = line.indexOf(key2, key1.length() + indexOfKey1);
+    return Double.valueOf(line.substring(indexOfKey1 + key1.length(), indexOfKey2));
   }
 
   private static String findTestClass(String line) {
