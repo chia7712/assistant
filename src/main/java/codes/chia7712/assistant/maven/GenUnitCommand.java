@@ -106,7 +106,7 @@ public class GenUnitCommand {
     try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
       String line;
       while ((line = reader.readLine()) != null) {
-        if (!line.startsWith("[INFO] Tests run")) {
+        if (!line.contains("Tests run:")) {
           continue;
         }
         parse(line).ifPresent(results::add);
