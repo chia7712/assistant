@@ -19,13 +19,13 @@ public class GenUnitCommand {
   );
   private static final String EXTRA_OPTS = null;
   private static final String BRANCH = "master";
-  private static final String ISSUE = "18241";
+  private static final String ISSUE = "18295";
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
           + ("master".equals(BRANCH) ? "" : "_" + BRANCH);
   private static final boolean ALL_TEST = true;
-
+  private static final boolean DISABLE_COLOR = true;
   public static void main(String[] args) throws IOException {
     List<TestFileResult> results = new ArrayList<>(100);
     File dir = new File(PATH);
@@ -77,7 +77,8 @@ public class GenUnitCommand {
 
   private static List<String> generateSeparateCommand(Set<TestFileResult> results) {
     return results.stream()
-      .map(r -> "mvn clean test -Dtest=" + r.getTestClass() + " -P skipSparkTests | tee ~/test_" + r.getSimpleTestClass())
+      .map(r -> "mvn clean test -Dtest=" + r.getTestClass() + " -P skipSparkTests " + (DISABLE_COLOR ? "-B" : "")
+              + " | tee ~/test_" + r.getSimpleTestClass())
       .collect(Collectors.toList());
   }
 
@@ -94,7 +95,8 @@ public class GenUnitCommand {
       builder.append(" ")
               .append(EXTRA_OPTS);
     }
-    builder.append(" | tee ~/test")
+    builder.append(DISABLE_COLOR ? " -B" : "")
+           .append(" | tee ~/test")
            .append("master".equals(BRANCH) ? "" : "_" + BRANCH)
            .append("_")
            .append(ISSUE);
