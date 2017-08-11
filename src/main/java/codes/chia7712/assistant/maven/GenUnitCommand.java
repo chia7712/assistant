@@ -15,11 +15,14 @@ import java.util.stream.Collectors;
 public class GenUnitCommand {
 
   private static final List<TestFileResult> SKIPPED_CLASSES = Arrays.asList(
-    new TestFileResult("org.apache.hadoop.hbase.http.TestSpnegoHttpServer")
+    new TestFileResult("org.apache.hadoop.hbase.http.TestSpnegoHttpServer"),
+    new TestFileResult("org.apache.hadoop.hbase.master.TestMasterFailover"),
+    new TestFileResult("org.apache.hadoop.hbase.master.assignment.TestAssignmentManager"),
+    new TestFileResult("org.apache.hadoop.hbase.util.TestPoolMap")
   );
   private static final String EXTRA_OPTS = null;
   private static final String BRANCH = "master";
-  private static final String ISSUE = "18295";
+  private static final String ISSUE = "18546";
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
