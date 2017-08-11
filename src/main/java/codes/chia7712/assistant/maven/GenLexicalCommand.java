@@ -26,7 +26,7 @@ public class GenLexicalCommand {
     for (char i = 65; i != 91; ++i) {
       if (filenames.contains(format(i))) {
         System.out.println("mvn clean test -Dtest=Test" + i
-                + "* -B -P skipSparkTests | ~/tee " + format(i));
+                + "* -B -P skipSparkTests | tee ~/" + format(i));
       }
     }
   }
