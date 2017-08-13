@@ -18,11 +18,13 @@ public class GenUnitCommand {
     new TestFileResult("org.apache.hadoop.hbase.http.TestSpnegoHttpServer"),
     new TestFileResult("org.apache.hadoop.hbase.master.TestMasterFailover"),
     new TestFileResult("org.apache.hadoop.hbase.master.assignment.TestAssignmentManager"),
-    new TestFileResult("org.apache.hadoop.hbase.util.TestPoolMap")
+    new TestFileResult("org.apache.hadoop.hbase.util.TestPoolMap"),
+    new TestFileResult("org.apache.hadoop.hbase.quotas.TestQuotaThrottle"),
+    new TestFileResult("org.apache.hadoop.hbase.rest.client.TestXmlParsing")
   );
   private static final String EXTRA_OPTS = null;
   private static final String BRANCH = "master";
-  private static final String ISSUE = "18546";
+  private static final String ISSUE = "18572";
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
@@ -72,10 +74,17 @@ public class GenUnitCommand {
     skipped.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("neverSucceed UTs:" + neverSucceed.stream().mapToInt(v -> v.getNumberOfErrors() + v.getNumberOfFailures()).sum());
     neverSucceed.forEach(v -> System.out.println(v.getTestClass()));
-    System.out.println("----------------------");
+    System.out.println("\n----------------------[Exclude succeed tests]----------------------");
     System.out.println(generateGeneralCommand(successes));
-    System.out.println("----------------------");
+    System.out.println("\n----------------------[Exclude succeed/failed tests]---------------------");
+    Set<TestFileResult> succeedAndFailed = new TreeSet<>();
+    succeedAndFailed.addAll(successes);
+    succeedAndFailed.addAll(neverSucceed);
+    System.out.println(generateGeneralCommand(succeedAndFailed));
+    System.out.println("\n----------------------[Failed tests]----------------------");
     generateSeparateCommand(neverSucceed).forEach(System.out::println);
+    System.out.println("\n----------------------[All failed tests]----------------------");
+    System.out.println(generateSeparateCommandInSingle(neverSucceed));
   }
 
   private static List<String> generateSeparateCommand(Set<TestFileResult> results) {
@@ -83,6 +92,21 @@ public class GenUnitCommand {
       .map(r -> "mvn clean test -Dtest=" + r.getTestClass() + " -P skipSparkTests " + (DISABLE_COLOR ? "-B" : "")
               + " | tee ~/test_" + r.getSimpleTestClass())
       .collect(Collectors.toList());
+  }
+
+  private static String generateSeparateCommandInSingle(Set<TestFileResult> results) {
+    StringBuilder builder = new StringBuilder(300);
+    builder.append("mvn clean test -Dtest=\"");
+    results.forEach(v -> {
+      builder.append(v.getTestClass())
+             .append(",");
+    });
+    if (!results.isEmpty()) {
+      builder.deleteCharAt(builder.length() - 1);
+    }
+    builder.append("\" -P skipSparkTests | tee ~/test_")
+           .append(ISSUE);
+    return builder.toString();
   }
 
   private static String generateGeneralCommand(Set<TestFileResult> results) {
