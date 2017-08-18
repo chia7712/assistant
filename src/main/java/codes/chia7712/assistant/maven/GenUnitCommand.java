@@ -14,17 +14,23 @@ import java.util.stream.Collectors;
 
 public class GenUnitCommand {
 
-  private static final List<TestFileResult> SKIPPED_CLASSES = Arrays.asList(
-    new TestFileResult("org.apache.hadoop.hbase.http.TestSpnegoHttpServer"),
-    new TestFileResult("org.apache.hadoop.hbase.master.TestMasterFailover"),
-    new TestFileResult("org.apache.hadoop.hbase.master.assignment.TestAssignmentManager"),
-    new TestFileResult("org.apache.hadoop.hbase.util.TestPoolMap"),
-    new TestFileResult("org.apache.hadoop.hbase.quotas.TestQuotaThrottle"),
-    new TestFileResult("org.apache.hadoop.hbase.rest.client.TestXmlParsing")
+  private static final List<String> SKIPPED_CLASSES = Arrays.asList(
+          "org.apache.hadoop.hbase.http.TestSpnegoHttpServer",
+          "org.apache.hadoop.hbase.master.TestMasterFailover",
+          "org.apache.hadoop.hbase.master.assignment.TestAssignmentManager",
+          "org.apache.hadoop.hbase.util.TestPoolMap",
+          "org.apache.hadoop.hbase.quotas.TestQuotaThrottle",
+          "org.apache.hadoop.hbase.rest.client.TestXmlParsing",
+          "org.apache.hadoop.hbase.client.TestClientClusterStatus",
+          "org.apache.hadoop.hbase.client.TestMultiParallel",
+          "org.apache.hadoop.hbase.regionserver.TestCompactionInDeadRegionServer"
   );
+  private static final List<TestFileResult> SKIPPED_RESULTS
+          = SKIPPED_CLASSES.stream().map(TestFileResult::new).collect(Collectors.toList());
+
   private static final String EXTRA_OPTS = null;
   private static final String BRANCH = "master";
-  private static final String ISSUE = "18572";
+  private static final String ISSUE = "18503";
   private static final int PARALLER = 1;
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
@@ -41,7 +47,7 @@ public class GenUnitCommand {
     } else {
       System.out.println("No found of unittest dir:" + PATH);
     }
-    results.addAll(SKIPPED_CLASSES);
+    results.addAll(SKIPPED_RESULTS);
     Set<TestFileResult> successes = new TreeSet<>();
     Set<TestFileResult> failures = new TreeSet<>();
     Set<TestFileResult> errors = new TreeSet<>();

@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class GenLexicalCommand {
-  private static final String ISSUE = "18471";
+  private static final String ISSUE = "18503";
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest";
   public static void main(String[] args) {
