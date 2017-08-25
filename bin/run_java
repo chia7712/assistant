@@ -37,12 +37,8 @@ LOG4J=-Dlog4j.configuration=file:$PROJECT_HOME'/conf/log4j.properties'
 
 #----------[FIND CLASS]----------#
 CLASS=''
-if [ "$1" == "run_class" ]; then
-  if [ "$2" == "" ]; then
-    echo "Usage: run run_class <class> [<args>]"
-    exit 1
-  fi
-  CLASS=$2
+if [ "$1" != "" ]; then
+  CLASS=$1
   shift 1
 else
   echo "Usage: run run_class <class> [<args>]"
