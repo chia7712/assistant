@@ -16,26 +16,27 @@ public class GenUnitCommand {
 
   private static final List<String> SKIPPED_CLASSES = Arrays.asList(
           "org.apache.hadoop.hbase.http.TestSpnegoHttpServer",
-          "org.apache.hadoop.hbase.master.TestMasterFailover",
-          "org.apache.hadoop.hbase.master.assignment.TestAssignmentManager",
-          "org.apache.hadoop.hbase.util.TestPoolMap",
-          "org.apache.hadoop.hbase.quotas.TestQuotaThrottle",
-          "org.apache.hadoop.hbase.rest.client.TestXmlParsing",
-          "org.apache.hadoop.hbase.client.TestClientClusterStatus",
-          "org.apache.hadoop.hbase.client.TestMultiParallel",
-          "org.apache.hadoop.hbase.regionserver.TestCompactionInDeadRegionServer"
+      "org.apache.hadoop.hbase.rest.client.TestXmlParsing"
+//          "org.apache.hadoop.hbase.master.TestMasterFailover",
+//          "org.apache.hadoop.hbase.master.assignment.TestAssignmentManager",
+//          "org.apache.hadoop.hbase.util.TestPoolMap",
+//          "org.apache.hadoop.hbase.quotas.TestQuotaThrottle",
+//          "org.apache.hadoop.hbase.client.TestClientClusterStatus",
+//          "org.apache.hadoop.hbase.client.TestMultiParallel",
+//          "org.apache.hadoop.hbase.regionserver.TestCompactionInDeadRegionServer"
   );
   private static final List<TestFileResult> SKIPPED_RESULTS
           = SKIPPED_CLASSES.stream().map(TestFileResult::new).collect(Collectors.toList());
-
-  private static final String EXTRA_OPTS = null;
+  private static final List<String> EXTRA_OPTS = Arrays.asList(
+      "-PrunAllTests",
+      "-DHBasePatchProcess",
+      "-Dsurefire.rerunFailingTestsCount=2"
+  );
   private static final String BRANCH = "master";
-  private static final String ISSUE = "18503";
-  private static final int PARALLER = 1;
+  private static final String ISSUE = "hang";
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
           + ("master".equals(BRANCH) ? "" : "_" + BRANCH);
-  private static final boolean ALL_TEST = true;
   private static final boolean DISABLE_COLOR = true;
   public static void main(String[] args) throws IOException {
     List<TestFileResult> results = new ArrayList<>(100);
@@ -95,14 +96,14 @@ public class GenUnitCommand {
 
   private static List<String> generateSeparateCommand(Set<TestFileResult> results) {
     return results.stream()
-      .map(r -> "mvn clean test -Dtest=" + r.getTestClass() + " -P skipSparkTests " + (DISABLE_COLOR ? "-B" : "")
+      .map(r -> "mvn -Dtest=" + r.getTestClass() + " -P skipSparkTests " + (DISABLE_COLOR ? "clean test -B" : "")
               + " | tee ~/test_" + r.getSimpleTestClass())
       .collect(Collectors.toList());
   }
 
   private static String generateSeparateCommandInSingle(Set<TestFileResult> results) {
     StringBuilder builder = new StringBuilder(300);
-    builder.append("mvn clean test -Dtest=\"");
+    builder.append("mvn -Dtest=\"");
     results.forEach(v -> {
       builder.append(v.getTestClass())
              .append(",");
@@ -110,25 +111,17 @@ public class GenUnitCommand {
     if (!results.isEmpty()) {
       builder.deleteCharAt(builder.length() - 1);
     }
-    builder.append("\" -P skipSparkTests | tee ~/test_")
+    builder.append("\" -DskipSparkTests clean test | tee ~/test_")
            .append(ISSUE);
     return builder.toString();
   }
 
   private static String generateGeneralCommand(Set<TestFileResult> results) {
-    StringBuilder builder = new StringBuilder("mvn clean test -fae -Dtest.exclude.pattern=");
+    StringBuilder builder = new StringBuilder("mvn -Dtest.exclude.pattern=");
     results.forEach(r -> builder.append("**/*").append(r.getSimpleTestClass()).append(".java,"));
     builder.deleteCharAt(builder.length() - 1);
-    builder.append(" -DsecondPartForkCount=")
-            .append(PARALLER);
-    if (ALL_TEST) {
-      builder.append(" -PrunAllTests");
-    }
-    if (EXTRA_OPTS != null && EXTRA_OPTS.length() != 0) {
-      builder.append(" ")
-              .append(EXTRA_OPTS);
-    }
-    builder.append(DISABLE_COLOR ? " -B" : "")
+    EXTRA_OPTS.forEach(opt -> builder.append(" ").append(opt));
+    builder.append(DISABLE_COLOR ? " clean test -fae -B" : "")
            .append(" | tee ~/test")
            .append("master".equals(BRANCH) ? "" : "_" + BRANCH)
            .append("_")
