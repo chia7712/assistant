@@ -34,11 +34,10 @@ public class GenUnitCommand {
 //      "-DHBasePatchProcess",
       "-Dsurefire.rerunFailingTestsCount=2"
   );
-  private static final String BRANCH = "master";
+  private static final String TESTS_FOLDER = "unittest_branch-1";
   private static final String ISSUE = "hang";
   private static final String HOME = System.getProperty("user.home");
-  private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/unittest"
-          + ("master".equals(BRANCH) ? "" : "_" + BRANCH);
+  private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/" + TESTS_FOLDER;
   private static final boolean DISABLE_COLOR = true;
   public static void main(String[] args) throws IOException {
     List<TestFileResult> results = new ArrayList<>(100);
@@ -148,9 +147,7 @@ public class GenUnitCommand {
     builder.deleteCharAt(builder.length() - 1);
     EXTRA_OPTS.forEach(opt -> builder.append(" ").append(opt));
     builder.append(DISABLE_COLOR ? " clean test -fae -B" : "")
-           .append(" | tee ~/test")
-           .append("master".equals(BRANCH) ? "" : "_" + BRANCH)
-           .append("_")
+           .append(" | tee ~/test_")
            .append(ISSUE);
     return builder.substring(0, builder.length());
   }
@@ -170,6 +167,9 @@ public class GenUnitCommand {
   }
 
   private static Optional<TestFileResult> parse(String line) {
+    if (line.contains("Flakes:")) {
+      return Optional.empty();
+    }
     final String[] elements = line.split(",");
     if (elements.length != 5) {
       return Optional.empty();
