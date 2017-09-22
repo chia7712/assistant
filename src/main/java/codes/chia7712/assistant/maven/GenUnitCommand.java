@@ -34,7 +34,7 @@ public class GenUnitCommand {
 //      "-DHBasePatchProcess",
       "-Dsurefire.rerunFailingTestsCount=2"
   );
-  private static final String TESTS_FOLDER = "unittest_branch-1";
+  private static final String TESTS_FOLDER = "unittest";
   private static final String ISSUE = "hang";
   private static final String HOME = System.getProperty("user.home");
   private static final String PATH = HOME + "/Dropbox/hbase-jira/" + ISSUE + "/" + TESTS_FOLDER;
@@ -115,7 +115,7 @@ public class GenUnitCommand {
 
   private static void printClassOrderByElapsed(Set<TestFileResult> results) {
     List<TestFileResult> r = new ArrayList<>(results);
-    Collections.sort(r, Comparator.comparingDouble(TestFileResult::getElapsed));
+    Collections.sort(r, Collections.reverseOrder(Comparator.comparingDouble(TestFileResult::getElapsed)));
     r.forEach(v -> System.out.println(v.getTestClass() + "\t" + v.getElapsed()));
   }
 
