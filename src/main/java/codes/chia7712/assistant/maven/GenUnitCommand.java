@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +31,7 @@ public class GenUnitCommand {
           = SKIPPED_CLASSES.stream().map(TestFileResult::new).collect(Collectors.toList());
   private static final List<String> EXTRA_OPTS = Arrays.asList(
       "-PrunAllTests",
-      "-DHBasePatchProcess",
+//      "-DHBasePatchProcess",
       "-Dsurefire.rerunFailingTestsCount=2"
   );
   private static final String BRANCH = "master";
@@ -70,16 +72,25 @@ public class GenUnitCommand {
     });
     failures.stream().filter(v -> !successes.contains(v)).forEach(neverSucceed::add);
     errors.stream().filter(v -> !successes.contains(v)).forEach(neverSucceed::add);
-    System.out.println("succeed classes:" + successes.size());
+
     System.out.println("succeed UTs:" + successes.stream().mapToInt(v -> v.getNumberOfUts()).sum());
-    successes.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("failed UTs:" + failures.stream().mapToInt(v -> v.getNumberOfFailures()).sum());
-    failures.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("erroneous UTs:" + errors.stream().mapToInt(v -> v.getNumberOfErrors()).sum());
-    errors.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("skipped UTs:" + skipped.stream().mapToInt(v -> v.getNumberOfSkipped()).sum());
-    skipped.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("neverSucceed UTs:" + neverSucceed.stream().mapToInt(v -> v.getNumberOfErrors() + v.getNumberOfFailures()).sum());
+
+    System.out.println("succeed classes:" + successes.size() + ", " + toTime(successes));
+    printClassOrderByElapsed(successes);
+
+    System.out.println("failed classes:" + failures.size());
+    failures.forEach(v -> System.out.println(v.getTestClass()));
+
+    System.out.println("error classes:" + errors.size());
+    errors.forEach(v -> System.out.println(v.getTestClass()));
+
+    System.out.println("skipped classes:" + skipped.size());
+    skipped.forEach(v -> System.out.println(v.getTestClass()));
+
     neverSucceed.forEach(v -> System.out.println(v.getTestClass()));
     System.out.println("\n----------------------[Exclude succeed tests]----------------------");
     System.out.println(generateGeneralCommand(successes));
@@ -92,6 +103,21 @@ public class GenUnitCommand {
     generateSeparateCommand(neverSucceed).forEach(System.out::println);
     System.out.println("\n----------------------[All failed tests]----------------------");
     System.out.println(generateSeparateCommandInSingle(neverSucceed));
+  }
+
+  private static String toTime(Set<TestFileResult> results) {
+    double secs = results.stream().mapToDouble(TestFileResult::getElapsed).sum();
+    long hours = (long) (secs / (60 * 60));
+    secs -= hours * (double) (60 * 60);
+    long mins = (long) (secs / 60);
+    secs -= mins * (double) (60);
+    return hours + ":" + mins + ":" + (long)secs;
+  }
+
+  private static void printClassOrderByElapsed(Set<TestFileResult> results) {
+    List<TestFileResult> r = new ArrayList<>(results);
+    Collections.sort(r, Comparator.comparingDouble(TestFileResult::getElapsed));
+    r.forEach(v -> System.out.println(v.getTestClass() + "\t" + v.getElapsed()));
   }
 
   private static List<String> generateSeparateCommand(Set<TestFileResult> results) {
