@@ -45,7 +45,6 @@ else
   exit 1
 fi
 ARGS=""
-shift 1
 i=0
 while [ -n "$1" ]
 do
