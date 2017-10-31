@@ -47,7 +47,7 @@ if [ "$1" == "reboot" ];then
   for node in ${nodes[@]}
   do
     echo $node will reboot
-    $SSH_CMD $node '/usr/sbin/reboot'
+    $SSH_CMD $node 'sudo reboot'
   done
   exit
 fi
