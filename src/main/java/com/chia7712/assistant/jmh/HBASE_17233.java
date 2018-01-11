@@ -1,4 +1,4 @@
-package codes.chia7712.assistant.jmh;
+package com.chia7712.assistant.jmh;
 
 import java.util.Arrays;
 import org.openjdk.jmh.annotations.Benchmark;

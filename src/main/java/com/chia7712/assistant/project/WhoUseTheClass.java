@@ -1,4 +1,4 @@
-package codes.chia7712.assistant.project;
+package com.chia7712.assistant.project;
 
 import java.io.BufferedReader;
 import java.io.File;

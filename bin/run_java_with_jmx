@@ -13,14 +13,21 @@ done
 BIN_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 PROJECT_HOME="$(dirname "$BIN_DIR")"
 
+#----------[JMX]----------#
+JMX_ENABLE="-Dcom.sun.management.jmxremote=true"
+JMX_PORT="-Dcom.sun.management.jmxremote.port=17777 -Dcom.sun.management.jmxremote.rmi.port=17777"
+JMX_DISABLE_SSL="-Dcom.sun.management.jmxremote.ssl=false"
+JMX_DISABLE_AUTH="-Dcom.sun.management.jmxremote.authenticate=false"
+JMX_OPTIONS="$JMX_ENABLE $JMX_PORT $JMX_DISABLE_SSL $JMX_DISABLE_AUTH"
+
+#----------[JAVA]----------#
+JAVA="java $HEAPSIZE $JMX_OPTIONS $IPV4_PREFER -cp"
+
 #----------[IPV4]----------#
 IPV4_PREFER="-Djava.net.preferIPv4Stack=true"
 
 #----------[HEAP SIZE]----------#
 HEAPSIZE="-Xmx4000m"
-
-#----------[JAVA]----------#
-JAVA="java $HEAPSIZE -cp"
 
 #----------[CLASSPATH]----------#
 CLASSPATH="${PROJECT_HOME}/lib_m/*:${PROJECT_HOME}/lib/*:${PROJECT_HOME}/conf/:${PROJECT_HOME}/build/libs/*"

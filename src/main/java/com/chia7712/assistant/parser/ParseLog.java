@@ -1,4 +1,4 @@
-package codes.chia7712.assistant.parser;
+package com.chia7712.assistant.parser;
 
 
 import java.io.BufferedReader;

@@ -1,4 +1,4 @@
-package codes.chia7712.assistant.maven;
+package com.chia7712.assistant.maven;
 
 import java.io.File;
 import java.util.ArrayList;

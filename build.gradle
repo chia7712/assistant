@@ -1,0 +1,22 @@
+group 'com.chia7712.assistant'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.18'
+  compile group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.18'
+  compile group: 'org.apache.hbase', name: 'hbase-common', version: '2.0.0-alpha4'
+  compile group: 'org.apache.hbase', name: 'hbase-client', version: '2.0.0-alpha4'
+}
+
+task copyDeps(type: Copy) {
+  into "$buildDir/libs"
+  from configurations.compile
+}

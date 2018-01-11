@@ -1,4 +1,4 @@
-package codes.chia7712.assistant.jmh;
+package com.chia7712.assistant.jmh;
 
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
